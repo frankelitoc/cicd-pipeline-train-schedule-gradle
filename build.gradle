@@ -36,3 +36,13 @@ build.dependsOn npm_build
 npm_build.dependsOn npmInstall
 npm_build.dependsOn npm_test
 npm_test.dependsOn npmInstall
+
+
+// Workaround for the 403 errors
+repositories.whenObjectAdded {
+    if (it instanceof IvyArtifactRepository) {
+        metadataSources {
+            artifact()
+        }
+    }
+}
