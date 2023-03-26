@@ -41,7 +41,7 @@ pipeline{
             steps{
                 withCredentials([usernamePassword(credentialsId: 'webserver_login', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
                     script {
-                        sh "ssh pass -p '$USERPASS' -v ssh -o ScrictHostKeyChecking=no $USERNAME@$prod_ip \"docker pull frank15ortiz/train-schedule:${env.BUILD_number}\""
+                        sh "sshpass -p '$USERPASS' -v ssh -o ScrictHostKeyChecking=no $USERNAME@$prod_ip \"docker pull frank15ortiz/train-schedule:${env.BUILD_number}\""
                         try {
                             sh "echo Hello World!"
                         } catch (err) {
