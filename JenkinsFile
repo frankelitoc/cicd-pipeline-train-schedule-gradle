@@ -15,9 +15,9 @@ pipeline{
             steps {
                 script {
                     app = docker.build("frank15ortiz/train-schedule")
-                    app.inside {
+                    /*app.inside {
                         sh 'echo $(curl localhost:8080)'
-                    }
+                    }*/
                 }
             }
         }
@@ -30,6 +30,23 @@ pipeline{
                     docker.withRegistry('https://registry.hub.docker.com', 'Docker_Hub_Login') {
                         app.push("${env.BUILD_NUMBER}")
                         app.push("latest")
+                    }
+                }
+            }
+        }
+        stage('Production Server Push') {
+            when {
+                branch 'master'
+            }
+            steps{
+                withCredentials([usernamePassword(credentialsId: 'webserver_login', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
+                    script {
+                        sh "ssh pass -p '$USERPASS' -v ssh -o ScrictHostKeyChecking=no $USERNAME@$prod_ip \"docker pull frank15ortiz/train-schedule:$(env.BUILD_number)\""
+                        try {
+                            sh "echo Hello World!"
+                        } catch (err) {
+                            echo: 'caught error $err'
+                        }
                     }
                 }
             }
