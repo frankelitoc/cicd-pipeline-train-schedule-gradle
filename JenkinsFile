@@ -43,10 +43,15 @@ pipeline{
                     script {
                         sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker pull frank15ortiz/train-schedule:${env.BUILD_number}\""
                         try {
-                            sh "echo Hello World!"
+
+                            // Stop any current running containers with our image & remove present image
+                            sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker stop train-schedule\""
+                            sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker rm train-schedule\""
                         } catch (err) {
                             echo: 'caught error $err'
                         }
+                        // Run our container
+                        sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker run --restart always --name train-schedule -p 8080:8080 -d frank15ortiz/train-schedule:${env.BUILD_number}\""
                     }
                 }
             }
